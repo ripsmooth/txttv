@@ -1,6 +1,6 @@
 {
   "functions": {
-    "api/yle-tekstitv.js": {
+    "api/yle-jalkapallo-ottelut.js": {
       "maxDuration": 10
     }
   }

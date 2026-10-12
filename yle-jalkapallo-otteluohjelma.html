@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="fi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Yle Teksti-TV · Otteluohjelma</title><style>
+:root{--ink:#101820;--panel:#1b2a35;--accent:#e8c547;--white:#fff;--muted:#bdc7d0;--gfx-width:1100px;--scale:1}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:transparent;overflow:hidden}
+body{font-family:Arial,Helvetica,sans-serif;color:var(--white);font-variant-numeric:tabular-nums}
+.stage{position:fixed;left:calc(50% + var(--offset-x,0px));top:calc(50% + var(--offset-y,0px));width:var(--gfx-width);transform:translate(-50%,-50%) scale(var(--scale));transform-origin:center center;filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))}
+.heading{min-height:62px;display:flex;align-items:center;justify-content:space-between;gap:18px;background:var(--ink);border-bottom:4px solid var(--accent);padding:12px 20px}
+.heading-title{font-size:25px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
+.competition{font-size:15px;color:var(--muted);font-weight:800;text-align:right}
+.subheading{background:var(--panel);padding:9px 20px;font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;display:flex;justify-content:space-between;gap:14px}
+table{width:100%;border-collapse:collapse;background:rgba(16,24,32,.97)}
+thead{background:var(--accent);color:var(--ink)}
+th{font-size:13px;text-transform:uppercase;letter-spacing:.04em;font-weight:900;padding:10px 9px;text-align:left;white-space:nowrap}
+td{padding:10px 9px;border-bottom:1px solid #34434d;font-size:17px;font-weight:800;vertical-align:middle}
+tbody tr:nth-child(even){background:rgba(27,42,53,.96)}
+tbody tr.featured{background:#263b48;box-shadow:inset 4px 0 0 var(--accent)}
+.time{width:105px;color:var(--accent);white-space:nowrap}
+.team{font-weight:900;text-transform:uppercase}
+.score{font-size:22px;font-weight:900;text-align:center;white-space:nowrap;color:var(--accent);width:100px}
+.status{font-size:12px;color:var(--muted);text-transform:uppercase;white-space:nowrap}
+.note{padding:10px 14px;background:rgba(16,24,32,.96);color:var(--muted);font-size:12px;border-top:2px solid var(--accent);display:flex;justify-content:space-between;gap:12px}
+.err{position:fixed;left:8px;bottom:8px;background:rgba(16,24,32,.96);border-left:4px solid var(--accent);padding:10px 14px;color:#fff;font-size:14px;max-width:calc(100vw - 16px)}
+.hidden{display:none!important}
+@media(max-width:700px){.heading{min-height:48px;padding:8px 12px}.heading-title{font-size:18px}.competition{font-size:11px}.subheading{padding:7px 12px;font-size:11px}th{font-size:10px;padding:7px 5px}td{font-size:12px;padding:8px 5px}.score{font-size:15px;width:65px}.time{width:65px}.status{font-size:10px}.note{font-size:10px}}
+</style></head>
+<body><div class="stage">
+ <div class="heading"><div class="heading-title">Otteluohjelma</div><div class="competition">YLE TEKSTI-TV · SIVU <span id="pageLabel">241</span></div></div>
+ <div class="subheading"><span id="leagueTitle">OTTELUT · VEIKKAUSLIIGA</span><span id="updated">PÄIVITYS 5 S</span></div>
+ <table aria-label="Otteluohjelma"><thead><tr><th class="time">AIKA</th><th>KOTIJOUKKUE</th><th class="score">TULOS</th><th>VIERASJOUKKUE</th><th>TILA</th></tr></thead>
+ <tbody id="rows"><tr><td colspan="5" style="text-align:center;padding:24px">Haetaan otteluohjelmaa Ylen Teksti-TV:stä…</td></tr></tbody></table>
+ <div class="note"><span id="footnote">Lähde: Yle Teksti-TV · sivu 241</span><span id="refreshLabel">Päivitetään 5 sekunnin välein</span></div>
+</div><div id="error" class="err hidden"></div>
+<script>
+(()=>{
+ const q=new URLSearchParams(location.search);
+ const page=(q.get('page')||'241').replace(/\D/g,'').slice(0,3)||'241';
+ const refresh=Math.max(5,Math.min(300,Number(q.get('refresh')||5)))*1000;
+ const width=Math.max(500,Math.min(2200,Number(q.get('width')||1100)));
+ const scale=Math.max(.4,Math.min(2.5,Number(q.get('scale')||1)));
+ const ox=Number(q.get('offsetX')||0),oy=Number(q.get('offsetY')||0);
+ document.documentElement.style.setProperty('--gfx-width',width+'px');
+ document.documentElement.style.setProperty('--scale',scale);
+ document.documentElement.style.setProperty('--offset-x',(Number.isFinite(ox)?ox:0)+'px');
+ document.documentElement.style.setProperty('--offset-y',(Number.isFinite(oy)?oy:0)+'px');
+ const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ $('pageLabel').textContent=page;$('refreshLabel').textContent='Päivitetään '+refresh/1000+' sekunnin välein';
+ function render(d){
+   const matches=Array.isArray(d.matches)?d.matches:[];
+   $('leagueTitle').textContent=d.title||'OTTELUT · VEIKKAUSLIIGA';
+   if(!matches.length){ $('rows').innerHTML='<tr><td colspan="5" style="text-align:center;padding:24px">Lähdesivulta ei löytynyt ottelurivejä.</td></tr>'; throw Error('Ylen sivun ottelurivejä ei tunnistettu. Tarkista API:n source_preview ja lähdesivun rakenne.'); }
+   $('rows').innerHTML=matches.map((m,i)=>{
+     const hasScore=m.score&&m.score!=='–'&&m.score!=='-';
+     const status=m.status||(hasScore?'TULOS':'OHJELMASSA');
+     const score=hasScore?m.score:'–';
+     return `<tr class="${m.live?'featured':''}"><td class="time">${esc(m.time||'—')}</td><td class="team">${esc(m.home||'—')}</td><td class="score">${esc(score)}</td><td class="team">${esc(m.away||'—')}</td><td class="status">${esc(status)}</td></tr>`;
+   }).join('');
+   $('updated').textContent='PÄIVITETTY '+new Date().toLocaleTimeString('fi-FI',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+   $('footnote').textContent=d.footer||'Lähde: Yle Teksti-TV · sivu '+page;$('error').classList.add('hidden');
+ }
+ async function update(){
+   try{const u=new URL('/api/yle-jalkapallo-ottelut',location.origin);u.searchParams.set('page',page);u.searchParams.set('ts',Date.now());
+     const r=await fetch(u,{cache:'no-store'});const d=await r.json();if(!r.ok)throw Error(d.error||'Ylen sivun haku epäonnistui');render(d);
+   }catch(e){ $('error').textContent='Ottelutietojen päivitys epäonnistui: '+(e.message||e)+' · Varmista, että Vercel-projektissa on mukana api/yle-jalkapallo-ottelut.js.';$('error').classList.remove('hidden'); }
+ }
+ if(q.get('demo')==='1'){
+   render({title:'JALKAPALLO · DEMO',footer:'ESIMERKKINÄKYMÄ · EI LIVE-TIETO',matches:[
+    {time:'15.00',home:'Ilves',away:'TPS',score:'–',status:'OHJELMASSA'},
+    {time:'15.00',home:'FC Inter',away:'AC Oulu',score:'–',status:'OHJELMASSA'},
+    {time:'17.00',home:'FF Jaro',away:'HJK',score:'–',status:'OHJELMASSA'},
+    {time:'17.00',home:'VPS',away:'KuPS',score:'–',status:'OHJELMASSA'},
+    {time:'19.00',home:'FC Lahti',away:'SJK',score:'–',status:'OHJELMASSA'},
+    {time:'19.00',home:'IFK Mariehamn',away:'IF Gnistan',score:'–',status:'OHJELMASSA'}
+   ]});
+ }else{update();setInterval(update,refresh);}
+})();
+</script></body></html>
