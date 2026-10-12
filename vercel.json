@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/yle-tekstitv.js": {
+      "maxDuration": 10
+    }
+  }
+}

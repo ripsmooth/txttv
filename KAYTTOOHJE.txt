@@ -1,0 +1,38 @@
+YLE TEKSTI-TV – GRAAFINEN SARJATAULUKKO
+========================================
+
+Tiedostot
+- yle-sarjataulukko.html : OBS-selainlähteen grafiikka
+- api/yle-tekstitv.js    : Vercel API, joka hakee sivun palvelimelta
+- vercel.json            : Vercel-reitityksen asetukset
+- KAYTTOOHJE.txt         : asennusohje
+
+Miksi mukana on API?
+Selain ei yleensä saa lukea Ylen sivua suoraan toisen verkkotunnuksen CORS-rajoitusten takia.
+Vercel API hakee sivun palvelimelta ja muuntaa sarjataulukon rivit grafiikan käyttämään muotoon.
+
+Käyttöönotto Vercelissä
+1. Pura ZIP omaan GitHub-repositorioon.
+2. Lataa kaikki tiedostot repositorioon. API-tiedoston pitää olla kansiossa api/yle-tekstitv.js.
+3. Tuo repositorio Verceliin ja julkaise se.
+4. Avaa julkaistu URL /yle-sarjataulukko.html.
+5. Lisää OBS:ään selainlähde ja anna URL tai käytä paikallista tiedostoa vain jos API on julkaistu samalla domainilla.
+   Käytännössä suositeltu tapa on käyttää julkaistua URL:ia.
+
+URL-parametrit
+- ?page=223       Teksti-TV:n sivu
+- ?refresh=5      päivitysväli sekunteina (minimi 5 s)
+- ?width=1100     grafiikan pohjaleveys
+- ?scale=1        skaalaus
+- ?offsetX=0      vaakasiirto pikseleinä
+- ?offsetY=0      pystysiirto pikseleinä
+- ?debug=1        debug-tiedot
+
+Esimerkki
+https://OMA-PROJEKTI.vercel.app/yle-sarjataulukko.html?page=223&refresh=5&width=1100&scale=1
+
+Tärkeää
+- Grafiikan tyyli mukailee mukana toimitettua salibandy-sarjataulukko.html-tiedostoa: tumma paneeli, keltainen korostus, vahva typografia ja televisiokäyttöön sopivat rivit.
+- Sivu 223 on testattu lähdesivun rakenteen osalta web-näkymän tekstisisällöstä, mutta Vercel-julkaisua ei ole tässä paketissa voitu testata.
+- Yle voi muuttaa sivun rakennetta. Jos rivien tunnistus lakkaa toimimasta, API palauttaa virheen eikä keksi sarjataulukkoa.
+- Tarkista Ylen käyttöehdot ennen julkista tai kaupallista lähetyskäyttöä.
