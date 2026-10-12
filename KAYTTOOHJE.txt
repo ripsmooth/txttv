@@ -1,52 +1,23 @@
-YLE TEKSTI-TV – JALKAPALLON TV-GRAFIIKAT
-==========================================
+KORJAUSPAKETTI – YLE JALKAPALLON TV-GRAFIIKAT
 
-Paketissa on kaksi OBS-selainlähteeseen sopivaa grafiikkaa:
-- yle-jalkapallo-otteluseuranta.html
-- yle-jalkapallo-otteluohjelma.html
+Tärkeä: API-tiedoston on oltava projektin juuressa kansiossa api:
+  api/yle-jalkapallo-ottelut.js
+HTML-tiedostojen ja vercel.jsonin pitää olla projektin juuressa.
 
-TYYLI
-Grafiikat käyttävät samaa visuaalista perustyyliä kuin salibandy-sarjataulukko:
-tummansininen/musta tausta, keltainen korostus, valkoinen vahva Arial-typografia,
-läpinäkyvä sivutausta ja keskitetty grafiikkapaneeli.
-
-TIETOLÄHDE
-Grafiikat hakevat tiedot Ylen Teksti-TV:n verkkosivulta 241:
-https://yle.fi/aihe/tekstitv?P=241
-Sivu 241 sisältää otteluseurannan/otteluohjelman. Sivun sisältö ja ottelurivien
-muoto voivat vaihdella. Mukana oleva Vercel API yrittää tunnistaa rivit lähdetekstistä.
-Tätä pakettia ei ole voitu testata julkaistua Vercel-projektia vasten; siksi tarkista
-API:n toiminta julkaisun jälkeen. Jos Yle muuttaa sivurakennetta, parseria täytyy säätää.
-Otteluseuranta ei voi näyttää reaaliaikaisia maalitapahtumia, ellei niitä ole
-julkaistu kyseisellä Teksti-TV-sivulla.
-
-KÄYTTÖÖNOTTO
-1. Pura ZIP GitHub-repositorioon tai pura kansio ja lataa kaikki sisältö repositorioon.
-2. Varmista, että api/yle-jalkapallo-ottelut.js ja vercel.json ovat mukana.
-3. Julkaise repositorio Vercelissä.
-4. Testaa ensin selaimessa:
+1. Korvaa vanhat tiedostot tämän ZIPin tiedostoilla (älä pura niitä ylimääräisen alikansion sisään).
+2. Tallenna GitHubiin ja odota Vercelin deploymentin valmistumista.
+3. Testaa ensin:
    https://OMA-PROJEKTI.vercel.app/api/yle-jalkapallo-ottelut?page=241
-5. Avaa grafiikka:
-   https://OMA-PROJEKTI.vercel.app/yle-jalkapallo-otteluseuranta.html
-   https://OMA-PROJEKTI.vercel.app/yle-jalkapallo-otteluohjelma.html
+   Odotettu tulos on JSON, ei HTML-sivu. Tämän version pitäisi tunnistaa myös Ylen tulosrivit muodossa “VPS - IF Gnistan 1-0 (1-0)”. Jos ottelut eivät silti näy, lähetä API:n koko JSON-vastaus.
+4. Avaa:
+   /yle-jalkapallo-otteluseuranta.html
+   /yle-jalkapallo-otteluohjelma.html
 
-DEMO
-Lisää URL:iin ?demo=1 nähdäksesi esimerkkiasettelun ilman live-dataa.
-Demo-ottelut ovat vain esimerkkisisältöä, eivät ajantasaisia ottelutietoja.
+Grafiikka näyttää nyt tarkemman virheen, jos API palauttaa HTML-sivun. Tämä auttaa erottamaan Vercelin 404/rewrites-ongelman varsinaisesta Ylen tietojen parseroinnista.
 
-URL-PARAMETRIT
-- ?page=241       Ylen Teksti-TV -sivu (oletus 241)
-- ?refresh=5      päivitysväli sekunteina (5–300)
-- ?width=1100     grafiikan perusleveys pikseleinä
-- ?scale=1        skaalaus
-- ?offsetX=0      vaakasiirto pikseleinä
-- ?offsetY=0      pystysiirto pikseleinä
-- ?demo=1         esimerkkidata grafiikan ulkoasun testaamiseen
+Ulkoasun demo:
+  /yle-jalkapallo-otteluseuranta.html?demo=1
+  /yle-jalkapallo-otteluohjelma.html?demo=1
 
-ESIMERKKI
-https://OMA-PROJEKTI.vercel.app/yle-jalkapallo-otteluseuranta.html?refresh=5&width=1100&scale=1
-
-HUOMIO
-Selainlähteenä suositellaan Vercel-julkaisun URL:ia. Pelkkä paikallinen HTML-tiedosto
-ei saa Ylen tietoja suoraan, koska API sijaitsee samassa julkaistussa projektissa.
-Tarkista Ylen käyttöehdot ennen julkista tai kaupallista lähetyskäyttöä.
+URL-parametrit: width=1100, scale=1, refresh=5, offsetX=0, offsetY=0.
+Huom: Ylen ottelurivien tunnistus riippuu lähdesivun todellisesta HTML-/tekstirakenteesta. Tarkista API:n JSON-vastaus ennen lähetystä.

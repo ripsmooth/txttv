@@ -60,7 +60,16 @@ tbody tr.featured{background:#263b48;box-shadow:inset 4px 0 0 var(--accent)}
  }
  async function update(){
    try{const u=new URL('/api/yle-jalkapallo-ottelut',location.origin);u.searchParams.set('page',page);u.searchParams.set('ts',Date.now());
-     const r=await fetch(u,{cache:'no-store'});const d=await r.json();if(!r.ok)throw Error(d.error||'Ylen sivun haku epäonnistui');render(d);
+     const r=await fetch(u,{cache:'no-store'});
+     const raw=await r.text();
+     let d;
+     try { d=JSON.parse(raw); }
+     catch(parseErr) {
+       const snippet=raw.replace(/<[^>]*>/g,' ').replace(/\\s+/g,' ').trim().slice(0,100);
+       if(r.status===404) throw Error('API-osoite palautti 404-sivun. Tarkista, että api/yle-jalkapallo-ottelut.js on GitHubissa kansiossa api/ ja julkaise Vercel uudelleen.');
+       throw Error('API palautti HTML:ää JSONin sijasta (HTTP '+r.status+'). Vercelin vastaus alkaa: '+snippet);
+     }
+     if(!r.ok)throw Error(d.error||('Ylen sivun haku epäonnistui (HTTP '+r.status+')'));render(d);
    }catch(e){ $('error').textContent='Ottelutietojen päivitys epäonnistui: '+(e.message||e)+' · Varmista, että Vercel-projektissa on mukana api/yle-jalkapallo-ottelut.js.';$('error').classList.remove('hidden'); }
  }
  if(q.get('demo')==='1'){
